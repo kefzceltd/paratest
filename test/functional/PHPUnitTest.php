@@ -41,6 +41,14 @@ class PHPUnitTest extends FunctionalTestBase
         ]));
     }
 
+    public function testWithSqliteRunner()
+    {
+        $this->assertTestsPassed($this->invokeParatest('passing-tests', [
+            'configuration' => PHPUNIT_CONFIGURATION,
+            'runner' => 'SqliteRunner',
+        ]));
+    }
+
     public function testWithCustomRunner()
     {
         $cb = new ProcessCallback();
@@ -95,6 +103,13 @@ class PHPUnitTest extends FunctionalTestBase
         $proc = $this->invokeParatest('paratest-only-tests/EnvironmentTest.php',
             ['bootstrap' => BOOTSTRAP, 'runner' => 'WrapperRunner', 'no-test-tokens' => 0]);
         $this->assertRegexp('/Failures: 1/', $proc->getOutput());
+    }
+
+    public function testParatestEnvironmentVariableWithSqliteRunner()
+    {
+        $this->assertTestsPassed($this->invokeParatest('paratest-only-tests/EnvironmentTest.php',
+            ['bootstrap' => BOOTSTRAP, 'runner' => 'SqliteRunner']
+        ));
     }
 
     public function testWithConfigurationInDirWithoutConfigFile()
@@ -224,7 +239,7 @@ class PHPUnitTest extends FunctionalTestBase
         $proc = $this->invokeParatest('fatal-tests/UnitTestWithFatalParseErrorTest.php', [
             'bootstrap' => BOOTSTRAP,
         ]);
-        $this->assertTrue(in_array($proc->getExitCode(), [1, 255], true));
+        $this->assertContains($proc->getExitCode(), [1, 255]);
     }
 
     public function testStopOnFailurePreventsStartingFurtherTestsAfterFailure()
